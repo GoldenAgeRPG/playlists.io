@@ -138,8 +138,8 @@
         </div>
 
         <div class="form-group">
-            <label>Subtítulo (Ex: Feiticeiro Jujutsu)</label>
-            <input type="text" id="input-type" placeholder="Feiticeiro de Grau Especial" oninput="generate()">
+            <label>Subtítulo</label>
+            <input type="text" id="input-type" placeholder="Minha Playlist" oninput="generate()">
         </div>
 
         <div class="form-group">
@@ -174,30 +174,27 @@
         </div>
 
         <h2 style="margin-top: 30px;">Preview</h2>
-        <div id="preview-box">
-            </div>
+        <div id="preview-box"></div>
     </div>
 </div>
 
 <script>
     function getTemplate(cover, type, title, desc, iframe) {
-        let css = `<style>.spot-container{max-width:550px;margin:15px auto;background:linear-gradient(180deg,#2a2a2a 0%,#121212 40%);border-radius:12px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#fff;padding:24px;box-sizing:border-box;box-shadow:0 8px 24px rgba(0,0,0,0.5)}.spot-header{display:flex;gap:20px;align-items:flex-end;margin-bottom:24px}.spot-cover{width:150px;height:150px;object-fit:cover;box-shadow:0 4px 60px rgba(0,0,0,.5);border-radius:4px}.spot-info{display:flex;flex-direction:column}.spot-type{font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:4px;letter-spacing:1px}.spot-title{font-size:36px;font-weight:900;margin:0;line-height:1.1;letter-spacing:-1px}.spot-desc{font-size:14px;color:#b3b3b3;margin:12px 0;line-height:1.4}.spot-iframe-wrapper{width:100%;margin-top:10px}</style>`;
+        let css = `<style>.spot-container{max-width:550px !important;margin:15px auto !important;background:linear-gradient(180deg,#2a2a2a 0%,#121212 40%) !important;border-radius:12px !important;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif !important;color:#fff !important;padding:24px !important;box-sizing:border-box !important;box-shadow:0 8px 24px rgba(0,0,0,0.5) !important;line-height:normal !important}.spot-container *{box-sizing:border-box !important}.spot-header{display:flex !important;gap:20px !important;align-items:flex-end !important;margin-bottom:24px !important}.spot-cover{width:150px !important;height:150px !important;min-width:150px !important;object-fit:cover !important;box-shadow:0 4px 60px rgba(0,0,0,.5) !important;border-radius:4px !important;border:none !important;padding:0 !important;margin:0 !important}.spot-info{display:flex !important;flex-direction:column !important;justify-content:flex-end !important;width:100% !important;overflow:hidden !important}.spot-type{font-size:12px !important;font-weight:700 !important;text-transform:uppercase !important;margin-bottom:4px !important;letter-spacing:1px !important;color:#fff !important}.spot-title{font-size:36px !important;font-weight:900 !important;margin:0 !important;line-height:1.1 !important;letter-spacing:-1px !important;color:#fff !important;text-transform:none !important;font-family:Georgia,serif !important}.spot-desc{font-size:14px !important;color:#b3b3b3 !important;margin:12px 0 0 0 !important;line-height:1.4 !important}.spot-iframe-wrapper{width:100% !important;margin-top:10px !important;overflow:hidden !important}.spot-iframe-wrapper iframe{width:100% !important;max-width:100% !important;border:none !important;display:block !important;margin:0 !important;padding:0 !important}</style>`;
         
-        let html = `<div class="spot-container"><div class="spot-header"><img src="${cover}" class="spot-cover"><div class="spot-info"><span class="spot-type">${type}</span><h1 class="spot-title">${title}</h1><p class="spot-desc">${desc}</p></div></div><div class="spot-iframe-wrapper">${iframe}</div></div>`;
+        let html = `<div class="spot-container"><div class="spot-header"><img src="${cover}" class="spot-cover"><div class="spot-info"><span class="spot-type">${type}</span><div class="spot-title">${title}</div><p class="spot-desc">${desc}</p></div></div><div class="spot-iframe-wrapper">${iframe}</div></div>`;
         
         return css + html;
     }
 
     function generate() {
         let cover = document.getElementById('input-cover').value || 'https://i.imgur.com/K1b7A6u.png';
-        let type = document.getElementById('input-type').value || 'Tipo';
-        let title = document.getElementById('input-title').value || 'Título';
-        let desc = document.getElementById('input-desc').value || 'Descrição';
+        let type = document.getElementById('input-type').value || 'SAYLIST';
+        let title = document.getElementById('input-title').value || 'Sayonara';
+        let desc = document.getElementById('input-desc').value || 'Tá olhando oq?????';
         let iframe = document.getElementById('input-iframe').value || '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
 
         let finalCode = getTemplate(cover, type, title, desc, iframe);
-        
-        // Remove quebras de linha para garantir linha única
         finalCode = finalCode.replace(/(\r\n|\n|\r)/gm, "");
         
         document.getElementById('output-code').value = finalCode;
@@ -214,13 +211,13 @@
         try {
             let coverImg = tempDiv.querySelector('.spot-cover');
             let typeSpan = tempDiv.querySelector('.spot-type');
-            let titleH1 = tempDiv.querySelector('.spot-title');
+            let titleDiv = tempDiv.querySelector('.spot-title');
             let descP = tempDiv.querySelector('.spot-desc');
             let iframeWrapper = tempDiv.querySelector('.spot-iframe-wrapper');
 
             if (coverImg) document.getElementById('input-cover').value = coverImg.src;
             if (typeSpan) document.getElementById('input-type').value = typeSpan.innerText;
-            if (titleH1) document.getElementById('input-title').value = titleH1.innerText;
+            if (titleDiv) document.getElementById('input-title').value = titleDiv.innerText;
             if (descP) document.getElementById('input-desc').value = descP.innerText;
             if (iframeWrapper) {
                 let iframeTag = iframeWrapper.querySelector('iframe');
@@ -229,9 +226,8 @@
 
             generate();
             document.getElementById('import-code').value = '';
-            alert('Código importado com sucesso!');
         } catch (e) {
-            alert('Erro ao importar. O código pode estar incompleto ou não pertencer a este template.');
+            alert('Erro ao importar o código.');
         }
     }
 
@@ -242,7 +238,6 @@
         navigator.clipboard.writeText(copyText.value);
     }
 
-    // Gerar preview inicial
     window.onload = generate;
 </script>
 
