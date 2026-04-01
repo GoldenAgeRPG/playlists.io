@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golden Age Playlists - Gerenciador</title>
+<style>
+    :root {
+        --bg-dark: #121212;
+        --bg-panel: #1e1e1e;
+        --primary-purple: #8a2be2;
+        --hover-purple: #9b59b6;
+        --text-main: #ffffff;
+        --text-muted: #b3b3b3;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    h1 {
+        color: var(--primary-purple);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 30px;
+        text-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+    }
+
+    .container {
+        display: flex;
+        gap: 30px;
+        width: 100%;
+        max-width: 1200px;
+    }
+
+    .panel {
+        background-color: var(--bg-panel);
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        border-top: 4px solid var(--primary-purple);
+        flex: 1;
+    }
+
+    .panel h2 {
+        margin-top: 0;
+        font-size: 18px;
+        color: var(--primary-purple);
+        border-bottom: 1px solid #333;
+        padding-bottom: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+    }
+
+    input[type="text"], textarea {
+        width: 100%;
+        background-color: #2a2a2a;
+        border: 1px solid #444;
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    input[type="text"]:focus, textarea:focus {
+        outline: none;
+        border-color: var(--primary-purple);
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    button {
+        background-color: var(--primary-purple);
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        background-color: var(--hover-purple);
+    }
+
+    .output-group {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #333;
+    }
+
+    #preview-box {
+        background-color: #222;
+        padding: 20px;
+        border-radius: 5px;
+        min-height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px dashed #444;
+    }
+</style>
+</head>
+<body>
+
+<h1>Golden Age Playlists</h1>
+
+<div class="container">
+    <div class="panel">
+        <h2>Editor de Playlist</h2>
+        
+        <div class="form-group">
+            <label>URL da Imagem de Capa</label>
+            <input type="text" id="input-cover" placeholder="https://i.imgur.com/K1b7A6u.png" oninput="generate()">
+        </div>
+
+        <div class="form-group">
+            <label>Subtítulo (Ex: Feiticeiro Jujutsu)</label>
+            <input type="text" id="input-type" placeholder="Feiticeiro de Grau Especial" oninput="generate()">
+        </div>
+
+        <div class="form-group">
+            <label>Título (Nome do Personagem)</label>
+            <input type="text" id="input-title" placeholder="Nome do Personagem" oninput="generate()">
+        </div>
+
+        <div class="form-group">
+            <label>Descrição</label>
+            <input type="text" id="input-desc" placeholder="Temas de batalha, expansão de domínio..." oninput="generate()">
+        </div>
+
+        <div class="form-group">
+            <label>Código Iframe do Spotify</label>
+            <textarea id="input-iframe" placeholder="Cole o <iframe...> do Spotify aqui" oninput="generate()"></textarea>
+        </div>
+
+        <div class="output-group">
+            <label>Código Gerado (Linha Única)</label>
+            <textarea id="output-code" readonly onclick="this.select()"></textarea>
+            <button onclick="copyCode()">Copiar Código</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Importar / Preview</h2>
+        
+        <div class="form-group">
+            <label>Colar código existente para edição</label>
+            <textarea id="import-code" placeholder="Cole o código gerado anteriormente aqui para editá-lo"></textarea>
+            <button onclick="importData()" style="background-color: #444;">Importar e Editar</button>
+        </div>
+
+        <h2 style="margin-top: 30px;">Preview</h2>
+        <div id="preview-box">
+            </div>
+    </div>
+</div>
+
+<script>
+    function getTemplate(cover, type, title, desc, iframe) {
+        let css = `<style>.spot-container{max-width:550px;margin:15px auto;background:linear-gradient(180deg,#2a2a2a 0%,#121212 40%);border-radius:12px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#fff;padding:24px;box-sizing:border-box;box-shadow:0 8px 24px rgba(0,0,0,0.5)}.spot-header{display:flex;gap:20px;align-items:flex-end;margin-bottom:24px}.spot-cover{width:150px;height:150px;object-fit:cover;box-shadow:0 4px 60px rgba(0,0,0,.5);border-radius:4px}.spot-info{display:flex;flex-direction:column}.spot-type{font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:4px;letter-spacing:1px}.spot-title{font-size:36px;font-weight:900;margin:0;line-height:1.1;letter-spacing:-1px}.spot-desc{font-size:14px;color:#b3b3b3;margin:12px 0;line-height:1.4}.spot-iframe-wrapper{width:100%;margin-top:10px}</style>`;
+        
+        let html = `<div class="spot-container"><div class="spot-header"><img src="${cover}" class="spot-cover"><div class="spot-info"><span class="spot-type">${type}</span><h1 class="spot-title">${title}</h1><p class="spot-desc">${desc}</p></div></div><div class="spot-iframe-wrapper">${iframe}</div></div>`;
+        
+        return css + html;
+    }
+
+    function generate() {
+        let cover = document.getElementById('input-cover').value || 'https://i.imgur.com/K1b7A6u.png';
+        let type = document.getElementById('input-type').value || 'Tipo';
+        let title = document.getElementById('input-title').value || 'Título';
+        let desc = document.getElementById('input-desc').value || 'Descrição';
+        let iframe = document.getElementById('input-iframe').value || '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
+
+        let finalCode = getTemplate(cover, type, title, desc, iframe);
+        
+        // Remove quebras de linha para garantir linha única
+        finalCode = finalCode.replace(/(\r\n|\n|\r)/gm, "");
+        
+        document.getElementById('output-code').value = finalCode;
+        document.getElementById('preview-box').innerHTML = finalCode;
+    }
+
+    function importData() {
+        let importedString = document.getElementById('import-code').value;
+        if (!importedString) return;
+
+        let tempDiv = document.createElement('div');
+        tempDiv.innerHTML = importedString;
+
+        try {
+            let coverImg = tempDiv.querySelector('.spot-cover');
+            let typeSpan = tempDiv.querySelector('.spot-type');
+            let titleH1 = tempDiv.querySelector('.spot-title');
+            let descP = tempDiv.querySelector('.spot-desc');
+            let iframeWrapper = tempDiv.querySelector('.spot-iframe-wrapper');
+
+            if (coverImg) document.getElementById('input-cover').value = coverImg.src;
+            if (typeSpan) document.getElementById('input-type').value = typeSpan.innerText;
+            if (titleH1) document.getElementById('input-title').value = titleH1.innerText;
+            if (descP) document.getElementById('input-desc').value = descP.innerText;
+            if (iframeWrapper) {
+                let iframeTag = iframeWrapper.querySelector('iframe');
+                if (iframeTag) document.getElementById('input-iframe').value = iframeTag.outerHTML;
+            }
+
+            generate();
+            document.getElementById('import-code').value = '';
+            alert('Código importado com sucesso!');
+        } catch (e) {
+            alert('Erro ao importar. O código pode estar incompleto ou não pertencer a este template.');
+        }
+    }
+
+    function copyCode() {
+        let copyText = document.getElementById("output-code");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+    }
+
+    // Gerar preview inicial
+    window.onload = generate;
+</script>
+
+</body>
+</html>
